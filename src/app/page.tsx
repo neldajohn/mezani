@@ -11,6 +11,8 @@ const CITY_EMOJI: Record<string, string> = {
   Mwanza: "🎣",
   Dodoma: "🏛️",
   Moshi: "☕",
+  Mbeya: "⛰️",
+  Tanga: "🌴",
 };
 
 export default function Home() {
@@ -46,7 +48,7 @@ export default function Home() {
           Chagua jiji lako upate mikahawa iliyo karibu nawe.
         </p>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8">
           {CITIES.map((city) => (
             <Link
               key={city}

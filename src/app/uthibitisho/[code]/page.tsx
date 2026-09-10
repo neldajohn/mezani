@@ -99,6 +99,33 @@ export default async function UthibitishoPage({
           </div>
         </dl>
 
+        {reservation.items.length > 0 && (
+          <div className="mt-4 rounded-lg bg-sand/60 px-3 py-3 text-sm text-forest-dark">
+            <p className="font-semibold">Menyu Uliyochagua</p>
+            <ul className="mt-2 space-y-1">
+              {reservation.items.map((item) => (
+                <li key={item.menuItemId} className="flex justify-between">
+                  <span>
+                    {item.name} × {item.quantity}
+                  </span>
+                  <span>
+                    TSh {(item.price * item.quantity).toLocaleString("sw-TZ")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-2 flex justify-between border-t border-forest-dark/10 pt-2 font-semibold">
+              <span>Jumla</span>
+              <span>
+                TSh{" "}
+                {reservation.items
+                  .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                  .toLocaleString("sw-TZ")}
+              </span>
+            </div>
+          </div>
+        )}
+
         {reservation.specialRequest && (
           <div className="mt-4 rounded-lg bg-sand/60 px-3 py-2 text-sm text-forest-dark">
             <span className="font-semibold">Maombi maalum: </span>

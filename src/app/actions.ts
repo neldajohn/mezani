@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getRestaurantBySlug } from "@/lib/restaurants";
 import { createReservation } from "@/lib/reservations";
+import { getMenuItems } from "@/lib/menu-items";
 
 const reservationSchema = z.object({
   slug: z.string().min(1),
@@ -47,6 +48,19 @@ export async function createReservationAction(
     return { error: "Mkahawa huu haukupatikana." };
   }
 
+  const validMenuItemIds = new Set(
+    getMenuItems(restaurant.id).map((item) => item.id),
+  );
+  const items = Array.from(formData.entries())
+    .filter(([key]) => key.startsWith("item_"))
+    .map(([key, value]) => ({
+      menuItemId: Number(key.slice("item_".length)),
+      quantity: Number(value),
+    }))
+    .filter(
+      (item) => validMenuItemIds.has(item.menuItemId) && item.quantity > 0,
+    );
+
   const reservation = createReservation({
     restaurantId: restaurant.id,
     fullName: parsed.data.fullName,
@@ -56,6 +70,7 @@ export async function createReservationAction(
     reservationDate: parsed.data.reservationDate,
     reservationTime: parsed.data.reservationTime,
     specialRequest: parsed.data.specialRequest || null,
+    items,
   });
 
   redirect(`/uthibitisho/${reservation.code}`);

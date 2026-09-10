@@ -33,6 +33,28 @@ export type Reservation = {
   createdAt: string;
 };
 
+export type MenuItem = {
+  id: number;
+  restaurantId: number;
+  name: string;
+  category: string;
+  price: number;
+};
+
+export type ReservationItem = {
+  menuItemId: number;
+  name: string;
+  price: number;
+  quantity: number;
+};
+
 export type ReservationWithRestaurant = Reservation & {
   restaurant: Restaurant;
+  items: ReservationItem[];
+};
+
+export type RestaurantAccount = {
+  id: number;
+  whatsappNumber: string;
+  restaurantId: number | null;
 };

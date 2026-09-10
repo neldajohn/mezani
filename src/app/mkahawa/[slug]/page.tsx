@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getRestaurantBySlug } from "@/lib/restaurants";
+import { getMenuItems } from "@/lib/menu-items";
 import { StarRating } from "@/components/StarRating";
 import { PriceTag } from "@/components/PriceTag";
 import { BookingWidget } from "@/components/BookingWidget";
@@ -24,6 +25,8 @@ export default async function RestaurantPage({
   if (!restaurant) {
     notFound();
   }
+
+  const menuItems = getMenuItems(restaurant.id);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -60,13 +63,18 @@ export default async function RestaurantPage({
               Menyu Maarufu
             </h2>
             <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {restaurant.popularDishes.map((dish) => (
+              {menuItems.map((item) => (
                 <li
-                  key={dish}
-                  className="flex items-center gap-2 rounded-lg bg-sand/60 px-3 py-2 text-sm text-forest-dark"
+                  key={item.id}
+                  className="flex items-center justify-between gap-2 rounded-lg bg-sand/60 px-3 py-2 text-sm text-forest-dark"
                 >
-                  <span>🍴</span>
-                  {dish}
+                  <span className="flex items-center gap-2">
+                    <span>🍴</span>
+                    {item.name}
+                  </span>
+                  <span className="font-semibold">
+                    TSh {item.price.toLocaleString("sw-TZ")}
+                  </span>
                 </li>
               ))}
             </ul>

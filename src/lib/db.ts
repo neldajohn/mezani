@@ -58,6 +58,50 @@ function createDb(): Database.Database {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
     );
+
+    CREATE TABLE IF NOT EXISTS menu_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      restaurant_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      category TEXT NOT NULL,
+      price INTEGER NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS reservation_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      reservation_id INTEGER NOT NULL,
+      menu_item_id INTEGER NOT NULL,
+      quantity INTEGER NOT NULL,
+      FOREIGN KEY (reservation_id) REFERENCES reservations(id),
+      FOREIGN KEY (menu_item_id) REFERENCES menu_items(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS restaurant_accounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      whatsapp_number TEXT UNIQUE NOT NULL,
+      restaurant_id INTEGER,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS login_codes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      whatsapp_number TEXT NOT NULL,
+      code TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      consumed_at TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS owner_sessions (
+      token TEXT PRIMARY KEY,
+      account_id INTEGER NOT NULL,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (account_id) REFERENCES restaurant_accounts(id)
+    );
   `);
 
   return db;

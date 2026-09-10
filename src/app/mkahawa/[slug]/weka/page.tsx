@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getRestaurantBySlug } from "@/lib/restaurants";
+import { getMenuItems } from "@/lib/menu-items";
 import { BookingForm } from "@/components/BookingForm";
 
 type SearchParams = {
@@ -37,6 +38,8 @@ export default async function WekaNafasiPage({
   if (!query.tarehe || !query.saa || !query.watu) {
     redirect(`/mkahawa/${slug}`);
   }
+
+  const menuItems = getMenuItems(restaurant.id);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -91,6 +94,7 @@ export default async function WekaNafasiPage({
             reservationDate={query.tarehe}
             reservationTime={query.saa}
             partySize={query.watu}
+            menuItems={menuItems}
           />
         </div>
       </div>

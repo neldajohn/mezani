@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { createReservationAction, type BookingFormState } from "@/app/actions";
+import { MenuPicker } from "./MenuPicker";
+import type { MenuItem } from "@/lib/types";
 
 const initialState: BookingFormState = {};
 
@@ -10,11 +12,13 @@ export function BookingForm({
   reservationDate,
   reservationTime,
   partySize,
+  menuItems,
 }: {
   slug: string;
   reservationDate: string;
   reservationTime: string;
   partySize: string;
+  menuItems: MenuItem[];
 }) {
   const [state, formAction, pending] = useActionState(
     createReservationAction,
@@ -86,6 +90,8 @@ export function BookingForm({
           </span>
         )}
       </label>
+
+      <MenuPicker items={menuItems} />
 
       <label className="flex flex-col gap-1">
         <span className="text-sm font-semibold text-forest-dark">

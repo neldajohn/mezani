@@ -30,6 +30,16 @@ export function buildReservationWhatsAppLink(
     `Namba ya Nafasi: ${reservation.code}`,
   ];
 
+  if (reservation.items.length > 0) {
+    lines.push(``, `Menyu:`);
+    let total = 0;
+    for (const item of reservation.items) {
+      lines.push(`- ${item.name} x${item.quantity}`);
+      total += item.price * item.quantity;
+    }
+    lines.push(`Jumla ya menyu: TSh ${total.toLocaleString("sw-TZ")}`);
+  }
+
   if (reservation.specialRequest) {
     lines.push(`Maombi maalum: ${reservation.specialRequest}`);
   }

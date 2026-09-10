@@ -47,6 +47,11 @@ export function Footer() {
                 Jinsi Inavyofanya Kazi
               </Link>
             </li>
+            <li>
+              <Link href="/mmiliki" className="transition hover:text-gold">
+                Wamiliki wa Mikahawa
+              </Link>
+            </li>
           </ul>
         </div>
 

@@ -1,6 +1,10 @@
 import { getDb } from "./db";
 import { getRestaurantById } from "./restaurants";
-import type { Reservation, ReservationWithRestaurant } from "./types";
+import type {
+  Reservation,
+  ReservationItem,
+  ReservationWithRestaurant,
+} from "./types";
 
 type ReservationRow = {
   id: number;
@@ -43,6 +47,11 @@ function generateCode(): string {
   return code;
 }
 
+export type NewReservationItem = {
+  menuItemId: number;
+  quantity: number;
+};
+
 export type NewReservation = {
   restaurantId: number;
   fullName: string;
@@ -52,6 +61,7 @@ export type NewReservation = {
   reservationDate: string;
   reservationTime: string;
   specialRequest?: string | null;
+  items?: NewReservationItem[];
 };
 
 export function createReservation(data: NewReservation): Reservation {
@@ -67,23 +77,64 @@ export function createReservation(data: NewReservation): Reservation {
        @reservationDate, @reservationTime, @specialRequest)
   `);
 
-  const result = insert.run({
-    code,
-    restaurantId: data.restaurantId,
-    fullName: data.fullName,
-    phone: data.phone,
-    email: data.email ?? null,
-    partySize: data.partySize,
-    reservationDate: data.reservationDate,
-    reservationTime: data.reservationTime,
-    specialRequest: data.specialRequest ?? null,
-  });
+  const insertItem = db.prepare(`
+    INSERT INTO reservation_items (reservation_id, menu_item_id, quantity)
+    VALUES (@reservationId, @menuItemId, @quantity)
+  `);
+
+  const reservationId = db.transaction(() => {
+    const result = insert.run({
+      code,
+      restaurantId: data.restaurantId,
+      fullName: data.fullName,
+      phone: data.phone,
+      email: data.email ?? null,
+      partySize: data.partySize,
+      reservationDate: data.reservationDate,
+      reservationTime: data.reservationTime,
+      specialRequest: data.specialRequest ?? null,
+    });
+
+    for (const item of data.items ?? []) {
+      insertItem.run({
+        reservationId: result.lastInsertRowid,
+        menuItemId: item.menuItemId,
+        quantity: item.quantity,
+      });
+    }
+
+    return result.lastInsertRowid;
+  })();
 
   const row = db
     .prepare("SELECT * FROM reservations WHERE id = ?")
-    .get(result.lastInsertRowid) as ReservationRow;
+    .get(reservationId) as ReservationRow;
 
   return rowToReservation(row);
+}
+
+function getReservationItems(reservationId: number): ReservationItem[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT mi.id as menu_item_id, mi.name, mi.price, ri.quantity
+       FROM reservation_items ri
+       JOIN menu_items mi ON mi.id = ri.menu_item_id
+       WHERE ri.reservation_id = ?`,
+    )
+    .all(reservationId) as {
+    menu_item_id: number;
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
+
+  return rows.map((row) => ({
+    menuItemId: row.menu_item_id,
+    name: row.name,
+    price: row.price,
+    quantity: row.quantity,
+  }));
 }
 
 export function getReservationByCode(code: string): ReservationWithRestaurant | null {
@@ -97,5 +148,21 @@ export function getReservationByCode(code: string): ReservationWithRestaurant | 
   const restaurant = getRestaurantById(reservation.restaurantId);
   if (!restaurant) return null;
 
-  return { ...reservation, restaurant };
+  return {
+    ...reservation,
+    restaurant,
+    items: getReservationItems(reservation.id),
+  };
+}
+
+export function getReservationsForRestaurant(
+  restaurantId: number,
+): Reservation[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      "SELECT * FROM reservations WHERE restaurant_id = ? ORDER BY reservation_date DESC, reservation_time DESC",
+    )
+    .all(restaurantId) as ReservationRow[];
+  return rows.map(rowToReservation);
 }
