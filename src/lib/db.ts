@@ -1,8 +1,13 @@
 import Database from "better-sqlite3";
 import path from "node:path";
 import fs from "node:fs";
+import os from "node:os";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// Serverless hosts (Vercel, etc.) ship a read-only deployment filesystem
+// except for the OS temp dir, so the db has to live there in production.
+const DATA_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), "mezani-data")
+  : path.join(process.cwd(), "data");
 const DB_PATH = path.join(DATA_DIR, "mezani.db");
 
 declare global {
