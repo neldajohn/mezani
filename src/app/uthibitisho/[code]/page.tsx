@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getReservationByCode } from "@/lib/reservations";
+import { buildReservationWhatsAppLink } from "@/lib/whatsapp";
 
 function formatDate(iso: string): string {
   const date = new Date(`${iso}T00:00:00`);
@@ -25,6 +26,7 @@ export default async function UthibitishoPage({
   }
 
   const { restaurant } = reservation;
+  const whatsappLink = buildReservationWhatsAppLink(reservation);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
@@ -107,6 +109,22 @@ export default async function UthibitishoPage({
         <div className="mt-5 rounded-lg bg-forest-dark/5 px-3 py-2 text-xs text-foreground/60">
           Anwani: {restaurant.address} · Simu: {restaurant.phone}
         </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-[#25D366]/30 bg-[#25D366]/10 p-5 text-center">
+        <p className="text-sm text-forest-dark">
+          Mjulishe <span className="font-semibold">{restaurant.name}</span> kupitia
+          WhatsApp ili wathibitishe nafasi yako haraka zaidi.
+        </p>
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-95"
+        >
+          <span aria-hidden>💬</span>
+          Thibitisha kwa WhatsApp
+        </a>
       </div>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
