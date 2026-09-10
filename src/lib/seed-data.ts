@@ -354,7 +354,7 @@ export const SEED_RESTAURANTS: SeedRestaurant[] = [
     description:
       "Mkahawa wa kifahari ndani ya Fahari Lodge, ukitoa chakula cha kisasa kilichochanganywa na ladha za asili, pamoja na ukumbi mtulivu wa bustani unaofaa kwa wageni wa kazi na familia.",
     address: "Barabara ya Nyerere Square, Dodoma",
-    phone: "+255 26 232 1010",
+    phone: "+255 713 597 956",
     opensAt: "07:00",
     closesAt: "22:30",
     accent: "from-violet-600 to-indigo-700",
